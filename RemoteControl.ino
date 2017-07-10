@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <FS.h>
 #include <ESP8266WiFi.h>
 #include "SSD1306Spi.h"
 #include "OLEDDisplayUi.h"
@@ -7,32 +8,28 @@
 #include <NtpClientLib.h>
 #include <Bounce2.h>
 #include <ArduinoJson.h>
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
+#include <WiFiManager.h>        
 #include <PubSubClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 
-#define Title "Remote Control v0.5"
-const char* mqtt_server = "192.168.178.100";
-const char* clientName="remoteBox";
-const char* ssid     = "fritzbox";
-const char* passwd   = "";
+#define Title "Remote Control v0.9"
 const uint sleeptimeout = 120000;
 
 WiFiClient client;
-#define WILL_FEED "/devices"
-#define OUT_FEED "/office/remoteboxout"
-#define IN_FEED "/office/remoteboxin"
-
+#define clientName "RemoteControl"
+const char* WILL_FEED="/devices";
+const char* OUT_FEED="/office/remoteboxout";
+const char* IN_FEED="/office/remoteboxin";
+const char* ntpserver ="0.de.pool.ntp.org";
  
-PubSubClient pubsubclient(client);
-Adafruit_MQTT_Client mqtt(&client, mqtt_server, 1883, "", "", "");
-Adafruit_MQTT_Publish box = Adafruit_MQTT_Publish(&mqtt, OUT_FEED, MQTT_QOS_1);
-
+bool shouldSaveConfig = false;
+char mqtt_server[40];
+WiFiClient espClient;
 ESP8266WebServer httpServer(1234);
 ESP8266HTTPUpdateServer httpUpdater;
+PubSubClient pubsubclient(espClient);
 
 
 SSD1306Spi  display(D8, D4, D6);
@@ -52,9 +49,4 @@ int menuState=0;
 
 
 
-/*
- * Only compiling when set to nodemcu 0.9
- * 
- * 
- */
 

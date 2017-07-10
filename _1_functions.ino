@@ -1,7 +1,63 @@
-void callback(char* topic, byte* payload, unsigned int length) {
+void saveConfigCallback () {
+  Serial.println("Should save config");
+  shouldSaveConfig = true;
+
+}
+void saveConfig(){
+ 
+    Serial.println("saving config");
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& json = jsonBuffer.createObject();
+    json["mqtt_server"] = mqtt_server;
+   
+    File configFile = SPIFFS.open("/config.json", "w");
+    if (!configFile) {
+      Serial.println("failed to open config file for writing");
+    }
+
+    json.printTo(Serial);
+    json.printTo(configFile);
+    configFile.close(); 
+}
+
+void LoadSetup(){
+if (SPIFFS.begin()) {
+    Serial.println("mounted file system");
+    if (SPIFFS.exists("/config.json")) {
+      //file exists, reading and loading
+      Serial.println("reading config file");
+      File configFile = SPIFFS.open("/config.json", "r");
+      if (configFile) {
+        Serial.println("opened config file");
+        size_t size = configFile.size();
+        // Allocate a buffer to store contents of the file.
+        std::unique_ptr<char[]> buf(new char[size]);
+
+        configFile.readBytes(buf.get(), size);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& json = jsonBuffer.parseObject(buf.get());
+        json.printTo(Serial);
+        if (json.success()) {
+          Serial.println("\nparsed json");
+
+          strcpy(mqtt_server, json["mqtt_server"]);
+          
+        
+        } else {
+          Serial.println("failed to load json config");
+        }
+      }
+    }
+  } else {
+    Serial.println("failed to mount FS");
+  }
   
+}
+
+
+void pubsubCallback(char* topic, byte* payload, unsigned int length) {
   
-  String json = String((char *)payload);
+   String json = String((char *)payload);
   Serial.print("char");
   Serial.println(json);
   StaticJsonBuffer<400> jsonBuffer;
@@ -67,12 +123,9 @@ void PrintCurrentTime()
 
 void PublishMessage(char* message)
 {
-  MQTT_connect();
-  String  jsonmessage = GetJsonMessage(message);
-  //mqttclient.publish(topic, jsonmessage.c_str()); // disable qos1
-  bool sent = box.publish(jsonmessage.c_str());
-  Serial.print("Status:");
-  Serial.println(sent);
+  PubSubConnect();
+  pubsubclient.publish(OUT_FEED, message);
+  
 }
 
 
@@ -100,54 +153,13 @@ void CheckCounterAndSleep()
   }
 
 }
-void MQTT_connect() {
-  int8_t ret;
 
-  // Stop if already connected.
-  if (mqtt.connected()) {
-    return;
-  }
 
-  Serial.print("Connecting to MQTT... ");
-
-  uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
-       Serial.println(mqtt.connectErrorString(ret));
-       Serial.println("Retrying MQTT connection in 10 seconds...");
-       mqtt.disconnect();
-       delay(10000);  // wait 10 seconds
-       retries--;
-       if (retries == 0) {
-         // basically die and wait for WDT to reset me
-         while (1);
-       }
-  }
-  Serial.println("MQTT Connected!");
-}
-
-void reconnect() {
-  // Loop until we're reconnected
-  while (!pubsubclient.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    if (pubsubclient.connect(clientName)) {
-      Serial.println("connected");
-      pubsubclient.publish("outTopic", "hello world");
-      
-      pubsubclient.subscribe("/office/boxfeed/");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(pubsubclient.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
-  }
-}
-
-String ipToString(IPAddress ip){
+/*
+ String ipToString(IPAddress ip){
   String s="";
   for (int i=0; i<4; i++)
     s += i  ? "." + String(ip[i]) : String(ip[i]);
   return s;
 }
+*/

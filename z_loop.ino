@@ -16,7 +16,7 @@ void loop() {
    
    if (!pubsubclient.connected()) {
     Serial.println("PubSubClient reconnect"); 
-    reconnect();
+    PubSubConnect();
   }
   pubsubclient.loop();
   

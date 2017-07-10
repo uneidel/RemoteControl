@@ -112,7 +112,7 @@ void UpClicklongPress(){
   display.drawString(30,20, "OTA");
   display.setFont(ArialMT_Plain_10);
   String srv= "http://";
-  srv += ipToString(WiFi.localIP());
+  srv += String(WiFi.localIP());
   
   Serial.print("UpdateServer:");
   Serial.println(srv);
