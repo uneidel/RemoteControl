@@ -1,18 +1,20 @@
-void loop() { 
+
+void loop() 
+{ 
   
   if (millis() > displaymessage)
   {
      display.clear();
-     display.drawString(20,0,Title);
+     display.drawString(10,0,Title);
      display.drawString(15,20,GetCurrentTime(false));
      DrawFooter();
      display.display();
   }
-   buttonMain.tick();
+   buttonSelect.tick();
    buttonUp.tick();
    buttonDown.tick();
-   buttonSingle.tick();
-   buttonMerge.tick();
+   buttonLeft.tick();
+   buttonRight.tick();
    
    if (!pubsubclient.connected()) {
     Serial.println("PubSubClient reconnect"); 
@@ -25,7 +27,8 @@ void loop() {
   CheckCounterAndSleep();
 }
 
-void DrawFooter(){
+void DrawFooter()
+{
   switch(menuState){
     case 0:
       display.drawHorizontalLine(0, 52, 25);
@@ -43,5 +46,4 @@ void DrawFooter(){
   display.drawString(88,52, "Custom");
   
 }
-
 

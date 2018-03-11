@@ -1,6 +1,7 @@
 
 
-void setup() {
+void setup() 
+{
  Serial.begin(115200);  
   WiFiManager wifiManager;
   
@@ -9,9 +10,6 @@ void setup() {
   LoadSetup();
 
   wifiManager.setSaveConfigCallback(saveConfigCallback);
-  //Adding an additional config on the WIFI manager webpage for the bot token
-  //WiFiManagerParameter custom_bot_id("botid", "Bot Token", bot_token, 50);
-  //wifiManager.addParameter(&custom_bot_id);
   WiFiManagerParameter custom_mqtt_server("mqtt", "MQTT Server", mqtt_server, 50);
   wifiManager.addParameter(&custom_mqtt_server);
   wifiManager.autoConnect("SetupHotSpot");
@@ -24,7 +22,7 @@ void setup() {
    }  
   display.init();
   display.flipScreenVertically();
- display.setLogBuffer(5, 30);
+  display.setLogBuffer(5, 30);
   display.drawString(20,20,Title);
   display.drawLogBuffer(0, 0);
   display.display();
@@ -38,16 +36,16 @@ void setup() {
 
 void InitButtons(){
   pinMode(D2,OUTPUT); // Some Fancy Workaround
-  buttonMain.attachDoubleClick(Maindoubleclick);
-  buttonMain.attachClick(Mainclick);
-  buttonMain.attachLongPressStop(MainlongPress);
+  buttonSelect.attachDoubleClick(Maindoubleclick);
+  buttonSelect.attachClick(Mainclick);
+  buttonSelect.attachLongPressStop(MainlongPress);
   buttonUp.attachClick(UpClick);
   buttonUp.attachLongPressStop(UpClicklongPress);
   buttonDown.attachClick(DownClick);
   pinMode(D1,OUTPUT);// Some Fancy Workaround
-  buttonSingle.attachClick(SingleClick);
-  pinMode(D9,OUTPUT);// Some Fancy Workaround
-  buttonMerge.attachClick(MergeClick);
+  buttonLeft.attachClick(SingleClick);
+//  pinMode(D9,OUTPUT);// Some Fancy Workaround
+  buttonRight.attachClick(MergeClick);
 }
 
 void setupNTP(){
@@ -58,7 +56,8 @@ void setupNTP(){
 }
 
 
-void PubSubConnect() {
+void PubSubConnect()
+{
   while (!pubsubclient.connected()) {
     Serial.print("Attempting MQTT connection...");
     if (pubsubclient.connect(clientName,WILL_FEED,1,false, clientName)) {
@@ -78,3 +77,5 @@ void SetupPubSub(){
   pubsubclient.setServer(mqtt_server, 1883);
   pubsubclient.setCallback(pubsubCallback);
 }
+
+

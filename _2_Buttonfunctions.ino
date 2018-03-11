@@ -1,5 +1,5 @@
-void Mainclick() {
-  
+
+  void Mainclick() {
     if (menuState == 2){ menuState = 0; }
     else {   menuState++;  }
     Serial.print("MenuState: ");
@@ -7,14 +7,16 @@ void Mainclick() {
     Serial.println("Main Button SinglePress");
 } 
 
-void Maindoubleclick() {
+void Maindoubleclick() 
+{
     
     PublishMessage("Play");
     Serial.println("Main Button DoublePress");
     DrawButtonAction("Play");
 } 
 
-void MainlongPress() {
+void MainlongPress() 
+{
     PublishMessage("Stop");
    Serial.println("Main Button LongPressEnd.");
    DrawButtonAction("Stop");
@@ -22,9 +24,8 @@ void MainlongPress() {
 
 
 
-/*  Other Buttons */
-
-void UpClick(){
+void UpClick()
+{
   char* action = "Failure";
  switch(menuState){
   
@@ -44,7 +45,8 @@ void UpClick(){
    DrawButtonAction(action);
 }
 
-void DownClick(){
+void DownClick()
+{
  char* message = "Failure";
  switch(menuState){
     case 0:
@@ -64,7 +66,8 @@ void DownClick(){
 }
 
 
-void MergeClick(){
+void MergeClick()
+{
 
   char* message = "Failure";
  switch(menuState){
@@ -84,7 +87,8 @@ void MergeClick(){
    PublishMessage(message);
    DrawButtonAction(message);
 }
-void SingleClick(){
+void SingleClick()
+{
   char* message = "Failure";
  switch(menuState){
   
@@ -105,7 +109,9 @@ void SingleClick(){
 }
 
 
-void UpClicklongPress(){
+
+void UpClicklongPress()
+{
   //Disable Sleep
   display.clear();
   display.setFont(ArialMT_Plain_24);
@@ -127,7 +133,8 @@ void UpClicklongPress(){
 }
 
 
-void DrawButtonAction(char* message){
+void DrawButtonAction(char* message)
+{
    display.clear();
   display.setFont(ArialMT_Plain_24);
   display.drawString(0,20, message);
@@ -135,6 +142,5 @@ void DrawButtonAction(char* message){
   DrawFooter();
   display.display();
   displaymessage = millis() + 1500;
-  
 }
 

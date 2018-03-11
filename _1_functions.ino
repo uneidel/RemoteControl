@@ -1,63 +1,64 @@
-void saveConfigCallback () {
+void saveConfigCallback() 
+{
   Serial.println("Should save config");
   shouldSaveConfig = true;
-
 }
-void saveConfig(){
- 
-    Serial.println("saving config");
+
+void saveConfig()
+{
+     Serial.println("saving config");
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     json["mqtt_server"] = mqtt_server;
    
     File configFile = SPIFFS.open("/config.json", "w");
-    if (!configFile) {
+    if (!configFile) 
+    {
       Serial.println("failed to open config file for writing");
     }
-
     json.printTo(Serial);
     json.printTo(configFile);
     configFile.close(); 
 }
 
-void LoadSetup(){
-if (SPIFFS.begin()) {
-    Serial.println("mounted file system");
-    if (SPIFFS.exists("/config.json")) {
-      //file exists, reading and loading
-      Serial.println("reading config file");
-      File configFile = SPIFFS.open("/config.json", "r");
-      if (configFile) {
-        Serial.println("opened config file");
-        size_t size = configFile.size();
-        // Allocate a buffer to store contents of the file.
-        std::unique_ptr<char[]> buf(new char[size]);
-
-        configFile.readBytes(buf.get(), size);
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        json.printTo(Serial);
-        if (json.success()) {
-          Serial.println("\nparsed json");
-
-          strcpy(mqtt_server, json["mqtt_server"]);
-          
-        
-        } else {
-          Serial.println("failed to load json config");
-        }
+void LoadSetup()
+{
+  if (SPIFFS.begin()) 
+  {
+      if (SPIFFS.exists("/config.json")) 
+      {
+        File configFile = SPIFFS.open("/config.json", "r");
+        if (configFile) 
+        {
+          Serial.println("opened config file");
+          size_t size = configFile.size();
+          std::unique_ptr<char[]> buf(new char[size]);
+          configFile.readBytes(buf.get(), size);
+          DynamicJsonBuffer jsonBuffer;
+          JsonObject& json = jsonBuffer.parseObject(buf.get());
+          json.printTo(Serial);
+          if (json.success()) 
+          {
+            strcpy(mqtt_server, json["mqtt_server"]);
+          } 
+          else 
+          {
+            Serial.println("failed to load json config");
+          }
+        } 
       }
+    } 
+    else 
+    {
+      Serial.println("failed to mount FS");
     }
-  } else {
-    Serial.println("failed to mount FS");
-  }
-  
 }
 
 
-void pubsubCallback(char* topic, byte* payload, unsigned int length) {
-  
-   String json = String((char *)payload);
+
+void pubsubCallback(char* topic, byte* payload, unsigned int length) 
+{
+  String json = String((char *)payload);
   Serial.print("char");
   Serial.println(json);
   StaticJsonBuffer<400> jsonBuffer;
@@ -67,7 +68,8 @@ void pubsubCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("message:");
   Serial.println(message);
   long duration =3000;
-  if (sduration != NULL){
+  if (sduration != NULL)
+  {
     duration =  atof(sduration);
     Serial.print("Duration: "); Serial.println(duration);
   }
@@ -98,6 +100,8 @@ void ShowMessage(String message, long duration){
   displaymessage = millis() + duration;
   
 }
+
+
 
 String GetCurrentTime(bool wait) {
   String datetimestring = "";
@@ -154,12 +158,3 @@ void CheckCounterAndSleep()
 
 }
 
-
-/*
- String ipToString(IPAddress ip){
-  String s="";
-  for (int i=0; i<4; i++)
-    s += i  ? "." + String(ip[i]) : String(ip[i]);
-  return s;
-}
-*/

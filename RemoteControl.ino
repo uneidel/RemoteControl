@@ -14,11 +14,12 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 
-#define Title "Remote Control v0.9"
+#define Title "RemoteControl v0.99"
 const uint sleeptimeout = 120000;
 
 WiFiClient client;
-#define clientName "RemoteControl"
+#define clientName "remotecontrol"
+
 const char* WILL_FEED="/devices";
 const char* OUT_FEED="/office/remoteboxout";
 const char* IN_FEED="/office/remoteboxin";
@@ -34,18 +35,15 @@ PubSubClient pubsubclient(espClient);
 
 SSD1306Spi  display(D8, D4, D6);
 // Init Buttons
-OneButton buttonMain(D2, true);
+OneButton buttonSelect(D2, true);
 OneButton buttonUp(D0, true);
 OneButton buttonDown(D3, true);
-OneButton buttonSingle(D1,true);
-OneButton buttonMerge(D9,true);
-
+OneButton buttonLeft(D1,true);
+OneButton buttonRight(3,true);
 //Message Stay
 long displaymessage= 0;
-
 // Menu State
 int menuState=0;
-
 
 
 
